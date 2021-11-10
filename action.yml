@@ -41,14 +41,14 @@ runs:
 
       - name: Upload raw
         uses: main-quest/actions.gsutil@v0.0.4
-        if: ${{ inputs.zip == false }}
+        if: ${{ inputs.zip == 'false' }}
         with:
           key: ${{ inputs.key }}
           do: -m cp -r "${{ inputs.path }}" "gs://${{ steps.bucket_namer.outputs.value }}/${{ github.run_id }}/${{ inputs.name }}/"
 
       - name: Zip files if asked to
         id: zip_preparer
-        if: ${{ inputs.zip == true }}
+        if: ${{ inputs.zip == 'true' }}
         shell: bash
         run: |
           d="${{ inputs.name }}"__zipped
@@ -59,7 +59,7 @@ runs:
 
       - name: Upload zipped if asked to
         uses: main-quest/actions.gsutil@v0.0.4
-        if: ${{ inputs.zip == true }}
+        if: ${{ inputs.zip == 'true' }}
         with:
           key: ${{ inputs.key }}
           do: -m cp -r "${{ steps.zip_preparer.outputs.file_path }}" "gs://${{ steps.bucket_namer.outputs.value }}/${{ github.run_id }}/${{ inputs.name }}/"
