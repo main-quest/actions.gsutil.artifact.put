@@ -1,0 +1,64 @@
+name: "Put artifact on GCS"
+description: "Uses main-quest/actions.gsutil"
+inputs:
+  key:
+    description: "Service account json key, base64 encrypted or not"
+    required: true
+  bucket:
+    description: |
+      "Leave empty to use the implicit 'gh-runs_<org-name>_<repo-name>'. 
+      Note that the bucket must already exist, and names can be up to 63 chars (as per GCS documentation).
+      For the implicit bucket name, dots are replaced by hyphens, slashes are replaced by underscores. The bucket name should be lowercase. For 'My-Dear-Org/my.repo', we get 'gh-runs_my-dear-org_my-repo'"
+    required: false
+  name:
+    description: "Artifact name. Artifacts are stored in folders under <bucket>/run-<run-id>/<artifact-name>/"
+    required: true
+  path:
+    description: "Source file/dir."
+    required: true
+  zip:
+    description: "Upload a single zip file with all the files at 'path'"
+    required: false
+    default: false
+    
+runs:
+  using: "composite"
+  steps:  
+      - name: Get bucket name
+        id: bucket_namer
+        shell: bash
+        run: |
+          b="${{ inputs.bucket }}"
+          if [ -z "$b" ]; then
+            repo="${{ github.repository }}"
+            b_no_slashes=$(echo "$repo" | sed "s/\//-/g")
+            b_no_dots=$(echo "$b_no_slashes" | sed "s/\./-/g")
+            b_lowercase=$(echo "$b_no_dots" | (tr '[:upper:]' '[:lower:]'))
+            b=gh_runs_"$b_lowercase"
+            echo "Using $b as implicit bucket name"
+          fi
+          echo "::set-output name=value::$b"
+
+      - name: Upload raw
+        uses: main-quest/actions.gsutil@v0.0.4
+        if: ${{ !inputs.zip }}
+        with:
+          key: ${{ inputs.key }}
+          do: -m cp -r "${{ inputs.path }}" "gs://${{ steps.bucket_namer.outputs.value }}/${{ github.run_id }}/${{ inputs.name }}/"
+
+      - name: Zip files if asked to
+        id: zip_preparer
+        if: ${{ inputs.zip }}
+        run: |
+          d="${{ inputs.name }}"__zipped
+          mkdir -p "$d"
+          f="$d"/"${{ inputs.name }}.zip"
+          zip -r "$f" "${{ inputs.path }}"
+          echo "::set-output name=file_path::$f"
+
+      - name: Upload zipped if asked to
+        uses: main-quest/actions.gsutil@v0.0.4
+        if: ${{ inputs.zip }}
+        with:
+          key: ${{ inputs.key }}
+          do: -m cp -r "${{ steps.zip_preparer.outputs.file_path }}" "gs://${{ steps.bucket_namer.outputs.value }}/${{ github.run_id }}/${{ inputs.name }}/"
