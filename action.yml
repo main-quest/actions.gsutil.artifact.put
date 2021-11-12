@@ -29,7 +29,7 @@ runs:
           bucket: ${{ inputs.bucket }}
 
       - name: Upload raw
-        uses: main-quest/actions.gsutil@v0.0.8
+        uses: main-quest/actions.gsutil@v0.0.9
         if: ${{ inputs.zip == 'false' }}
         with:
           key: ${{ inputs.key }}
@@ -47,7 +47,7 @@ runs:
           echo "::set-output name=file_path::$f"
 
       - name: Upload zipped if asked to
-        uses: main-quest/actions.gsutil@v0.0.8
+        uses: main-quest/actions.gsutil@v0.0.9
         if: ${{ inputs.zip == 'true' }}
         with:
           key: ${{ inputs.key }}
