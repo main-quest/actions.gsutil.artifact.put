@@ -59,8 +59,6 @@ runs:
         if: runner.os != 'Windows' && inputs.zip == 'true'
         shell: bash
         run: |
-          echo OS is ${{ runner.os }}
-          echo OS is2 $RUNNER_OS
           name="${{ inputs.name }}"
           path="${{ inputs.path }}"
 
@@ -78,7 +76,7 @@ runs:
           $name="${{ inputs.name }}"
           $path="${{ inputs.path }}"
 
-          $d="$name"__zipped
+          $d="$name"+"__zipped"
           New-Item -Type Directory -Force "$d" > $NULL
           f="$d/$name.zip"
           Compress-Archive -Path "$path" -DestinationPath "$f"
