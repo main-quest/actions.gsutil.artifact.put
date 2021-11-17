@@ -78,7 +78,7 @@ runs:
 
           $d="$name"+"__zipped"
           New-Item -Type Directory -Force "$d" > $NULL
-          f="$d/$name.zip"
+          $f="$d/$name.zip"
           Compress-Archive -Path "$path" -DestinationPath "$f"
 
           # Note! The Win path needs to be converted to unix path under WSL
