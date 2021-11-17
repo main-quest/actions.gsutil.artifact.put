@@ -59,6 +59,7 @@ runs:
         if: runner.os != 'Windows' && ${{ inputs.zip == 'true' }}
         shell: bash
         run: |
+          echo OS is ${{ runner.os }}
           name="${{ inputs.name }}"
           path="${{ inputs.path }}"
 
