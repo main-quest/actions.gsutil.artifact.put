@@ -60,6 +60,7 @@ runs:
         shell: bash
         run: |
           echo OS is ${{ runner.os }}
+          echo OS is2 $RUNNER_OS
           name="${{ inputs.name }}"
           path="${{ inputs.path }}"
 
