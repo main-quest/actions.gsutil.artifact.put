@@ -38,7 +38,7 @@ runs:
       #/OS
       - name: Zip files if asked [UNIX]
         id: zip_preparer_unix
-        if: runner.os != "Windows" && ${{ inputs.zip == 'true' }}
+        if: runner.os != 'Windows' && ${{ inputs.zip == 'true' }}
         shell: bash
         run: |
           name="${{ inputs.name }}"
@@ -52,7 +52,7 @@ runs:
 
       - name: Zip files if asked [WIN]
         id: zip_preparer_win
-        if: runner.os == "Windows" && ${{ inputs.zip == 'true' }}
+        if: runner.os == 'Windows' && ${{ inputs.zip == 'true' }}
         shell: powershell
         run: |
           $name="${{ inputs.name }}"
