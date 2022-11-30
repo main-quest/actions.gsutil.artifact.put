@@ -35,7 +35,8 @@ runs:
         shell: bash
         run: |
           p="${{ inputs.path }}"
-          echo "::set-output name=value::$p"
+          # echo "::set-output name=value::$p"
+          echo "value=$p" >> $GITHUB_OUTPUT
 
       - name: "Convert path [WIN]"
         id: path_converter_win
@@ -43,7 +44,8 @@ runs:
         shell: wsl bash --noprofile --norc -euo pipefail "$(s="$(wslpath '{0}')" && sed -i 's/\r$//' "$s" && echo "$s")"
         run: |
           p=$(wslpath "${{ inputs.path }}")
-          echo "::set-output name=value::$p"
+          # echo "::set-output name=value::$p"
+          echo "value=$p" >> $env:GITHUB_OUTPUT
       #OS/
 
       - name: "Upload raw"
@@ -66,7 +68,8 @@ runs:
           mkdir -p "$d"
           f="$d/$name.zip"
           zip -r "$f" "$path"
-          echo "::set-output name=file_path::$f"
+          # echo "::set-output name=file_path::$f"
+          echo "file_path=$f" >> $GITHUB_OUTPUT
 
       - name: "Zip files if asked [WIN]"
         id: zip_preparer_win
@@ -84,7 +87,8 @@ runs:
           # Note! The Win path needs to be converted to unix path under WSL
           $f=$(wsl wslpath "$f")
 
-          echo "::set-output name=file_path::$f"
+          # echo "::set-output name=file_path::$f"
+          echo "file_path=$f" >> $env:GITHUB_OUTPUT
       #/OS
 
       - name: "Upload zipped if asked"
