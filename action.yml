@@ -28,7 +28,7 @@ runs:
         with:
           bucket: ${{ inputs.bucket }}
 
-      #/OS
+      #OS/
       - name: "Convert path [UNIX]"
         id: path_converter_unix
         if: runner.os != 'Windows'
@@ -36,17 +36,21 @@ runs:
         run: |
           p="${{ inputs.path }}"
           # echo "::set-output name=value::$p"
-          echo "value=$p" >> $GITHUB_OUTPUT
+          echo "value=$p" >> "$GITHUB_OUTPUT"
 
       - name: "Convert path [WIN]"
         id: path_converter_win
         if: runner.os == 'Windows'
-        shell: wsl bash --noprofile --norc -euo pipefail "$(s="$(wslpath '{0}')" && sed -i 's/\r$//' "$s" && echo "$s")"
+        # shell: wsl bash --noprofile --norc -euo pipefail "$(s="$(wslpath '{0}')" && sed -i 's/\r$//' "$s" && echo "$s")"
+        # run: |
+        #   p=$(wslpath "${{ inputs.path }}")
+        #   # echo "::set-output name=value::$p"
+        #   echo "value=$p" >> "$env:GITHUB_OUTPUT"
+        shell: powershell
         run: |
-          p=$(wslpath "${{ inputs.path }}")
-          # echo "::set-output name=value::$p"
-          echo "value=$p" >> $env:GITHUB_OUTPUT
-      #OS/
+          $p="$(wsl bash --noprofile --norc -euo pipefail -c 'wslpath ''${{ inputs.path }}''')"
+          echo "value=$p" >> "$env:GITHUB_OUTPUT"
+      #/OS
 
       - name: "Upload raw"
         uses: main-quest/actions.gsutil@master
@@ -55,7 +59,7 @@ runs:
           key: ${{ inputs.key }}
           do: -m cp -r "${{ steps.path_converter_unix.outputs.value }}${{ steps.path_converter_win.outputs.value }}" "gs://${{ steps.namer.outputs.bucket_name }}/${{ github.run_id }}/${{ inputs.name }}/"
 
-      #/OS
+      #OS/
       - name: "Zip files if asked [UNIX]"
         id: zip_preparer_unix
         if: runner.os != 'Windows' && inputs.zip == 'true'
@@ -69,7 +73,7 @@ runs:
           f="$d/$name.zip"
           zip -r "$f" "$path"
           # echo "::set-output name=file_path::$f"
-          echo "file_path=$f" >> $GITHUB_OUTPUT
+          echo "file_path=$f" >> "$GITHUB_OUTPUT"
 
       - name: "Zip files if asked [WIN]"
         id: zip_preparer_win
@@ -88,7 +92,7 @@ runs:
           $f=$(wsl wslpath "$f")
 
           # echo "::set-output name=file_path::$f"
-          echo "file_path=$f" >> $env:GITHUB_OUTPUT
+          echo "file_path=$f" >> "$env:GITHUB_OUTPUT"
       #/OS
 
       - name: "Upload zipped if asked"
