@@ -57,7 +57,7 @@ runs:
         if: inputs.zip == 'false'
         with:
           key: ${{ inputs.key }}
-          do: -m cp -r "${{ steps.path_converter_unix.outputs.value }}${{ steps.path_converter_win.outputs.value }}" "gs://${{ steps.namer.outputs.bucket_name }}/${{ github.run_id }}/${{ inputs.name }}/"
+          do: -m cp -r "${{ steps.path_converter_unix.outputs.value }}${{ steps.path_converter_win.outputs.value }}" gs://${{ steps.namer.outputs.bucket_name }}/${{ github.run_id }}/${{ inputs.name }}/
 
       #OS/
       - name: "Zip files if asked [UNIX]"
@@ -100,4 +100,4 @@ runs:
         if: inputs.zip == 'true'
         with:
           key: ${{ inputs.key }}
-          do: -m cp -r "${{ steps.zip_preparer_unix.outputs.file_path }}${{ steps.zip_preparer_win.outputs.file_path }}" "gs://${{ steps.namer.outputs.bucket_name }}/${{ github.run_id }}/${{ inputs.name }}/"
+          do: -m cp -r "${{ steps.zip_preparer_unix.outputs.file_path }}${{ steps.zip_preparer_win.outputs.file_path }}" gs://${{ steps.namer.outputs.bucket_name }}/${{ github.run_id }}/${{ inputs.name }}/
